@@ -16,7 +16,7 @@ gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # convert to grayscale
 detector = dlib.get_frontal_face_detector()
 rects = detector(gray, 1) # rects contains all the faces detected
 
-predictor = dlib.shape_predictor('shape_68.dat')
+predictor = dlib.shape_predictor('face_recognizer/shape_68.dat')
 for (i, rect) in enumerate(rects):
     shape = predictor(gray, rect)
     shape = shape_to_np(shape)
