@@ -5,9 +5,8 @@ import os
 
 import weka.core.jvm as jvm
 
-from weka.core.converters import Saver
 from lib.pupil_tracker import face_shape_to_array, get_and_draw_pupils, on_threshold_change
-from lib.weka_classifier import create_dataset, add_to_dataset
+from lib.weka_classifier import create_dataset, add_to_dataset, save_dataset
 
 
 # With the detector, we get faces from frames represented as rectangles 
@@ -41,23 +40,21 @@ while(key != 27):
         face_shape = face_predictor(gray_frame, face)
         face_array = face_shape_to_array(face_shape)
 
-        frame, thresh, left_eye, right_eye = get_and_draw_pupils(frame, face_array)
+        frame, thresh, left_pupil, right_pupil = get_and_draw_pupils(frame, face_array)
 
         if key != -1:
-            add_to_dataset(dataset, key, left_eye, right_eye)
-            print(f'Instance added to dataset: {key}, {str(left_eye)}, {str(right_eye)}')
+            add_to_dataset(dataset, key, left_pupil, right_pupil)
+            print(f'Instance added to dataset: {key}, {str(left_pupil)}, {str(right_pupil)}')
 
     # Show the final frames
     cv2.imshow('Tracker', frame)
     cv2.imshow("Threshold", thresh)
     
+    # Get next key
     key = cv2.waitKey(1)
 
-t = time.localtime()
-current_time = time.strftime("%H-%M-%S", t)
-
-saver = Saver(classname="weka.core.converters.ArffSaver")
-saver.save_file(dataset, os.path.join(os.path.dirname(__file__), f'datasets/{current_time}.arff'))
+# Save the dataset
+save_dataset(dataset, os.path.join(os.path.dirname(__file__), f'datasets/{time.strftime("%H-%M-%S", time.localtime())}.arff'))
 
 jvm.stop()
 video.release()

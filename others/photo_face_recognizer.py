@@ -14,6 +14,7 @@ def shape_to_np(shape, dtype="int"):
 img = cv2.imread('shots/1.jpg')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # convert to grayscale 
 detector = dlib.get_frontal_face_detector()
+# detector = dlib.cnn_face_detection_model_v1('mmod_human_face_detector.dat')
 rects = detector(gray, 1) # rects contains all the faces detected
 
 predictor = dlib.shape_predictor('face_recognizer/shape_68.dat')
