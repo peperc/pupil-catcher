@@ -1,8 +1,12 @@
 # PYTHON
-.venv
+.venv/
+**/__pycache__/
 
 # IDE
 .vscode/
 
 # My face
 shots/
+
+# Others
+bitácora.txt

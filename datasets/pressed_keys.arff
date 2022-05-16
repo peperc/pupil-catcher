@@ -1,0 +1,27 @@
+@relation pressed_keys
+
+@attribute pressed_key numeric
+@attribute left_x numeric
+@attribute left_y numeric
+@attribute right_x numeric
+@attribute right_y numeric
+
+@data
+97,21,6,22,5
+98,21,4,23,5
+99,17,1,17,3
+100,20,1,21,4
+101,20,2,21,4
+102,20,2,21,4
+103,19,3,21,4
+104,18,1,19,3
+105,17,2,18,3
+106,17,2,18,3
+107,17,1,18,2
+108,18,2,18,2
+109,18,2,17,2
+110,20,3,19,2
+241,17,1,18,1
+111,18,2,17,1
+112,17,1,17,3
+113,17,2,17,2

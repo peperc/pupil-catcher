@@ -1,5 +1,4 @@
 import cv2
-import dlib
 import numpy as np
 from math import atan
 
@@ -8,8 +7,19 @@ from math import atan
 LEFT_EYE_POINTS = [36, 37, 38, 39, 40, 41]
 RIGHT_EYE_POINTS = [42, 43, 44, 45, 46, 47]
 
+
 # Value of the image threshold
 THRESHOLD = 0
+
+
+# Kernel is for later dilating the eye zone
+KERNEL = np.ones((9, 9), np.uint8)
+
+
+# Callback function for threshold change
+def on_threshold_change(val):
+    global THRESHOLD
+    THRESHOLD = val
 
 
 def rotate_image(frame, face_array):
@@ -81,8 +91,8 @@ def contours_pupil(frame, thres, face_array, eye_points):
     # Get two rectangles that surrounds the eyes
     eye_rectangle = get_eye_rectangle(face_array, eye_points)
     
-    # Draws the rectangles
-    # cv2.rectangle(frame, (eye_rectangle[0], eye_rectangle[3]), (eye_rectangle[1], eye_rectangle[2]), (0, 255, 0), 1)
+    # Draws the rectangle
+    cv2.rectangle(frame, (eye_rectangle[0], eye_rectangle[3]), (eye_rectangle[1], eye_rectangle[2]), (0, 255, 0), 1)
 
     # Finds contours inside the rectangle
     contours, _ = cv2.findContours(thres[eye_rectangle[2]:eye_rectangle[3], eye_rectangle[0]:eye_rectangle[1]], cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
@@ -98,89 +108,45 @@ def contours_pupil(frame, thres, face_array, eye_points):
 
         # Draw the circle
         cv2.circle(frame, (cx + eye_rectangle[0], cy + eye_rectangle[2]), 4, (0, 0, 255), 2)
+        
+        return (cx, cy)
     except:
-        pass
+        return None
 
 
-def on_threshold_change(val):
-    global THRESHOLD
-    THRESHOLD = val
+def get_and_draw_pupils(frame, face_array):
+    # Rotate image as head tilt
+    frame = rotate_image(frame, face_array)
 
-# With the detector, we get faces from frames represented as rectangles 
-faces_detector = dlib.get_frontal_face_detector()
-# faces_detector = dlib.cnn_face_detection_model_v1('mmod_human_face_detector.dat')
-# With the predictor, we get the 68 points representing the face from the face_detector's rectangles
-face_predictor = dlib.shape_predictor('shape_68.dat')
+    # Mask is an image sized as frame entirely black except for the eyes (in white)
+    mask = np.zeros(frame.shape[:2], dtype=np.uint8)
+    mask = colour_eye(mask, LEFT_EYE_POINTS, face_array)
+    mask = colour_eye(mask, RIGHT_EYE_POINTS, face_array)
 
+    # Expand the eye zone
+    mask = cv2.dilate(mask, KERNEL, iterations=5)
 
-# Create the threshold window
-cv2.namedWindow('Threshold')
-cv2.createTrackbar('Value', 'Threshold', 0, 255, on_threshold_change)
+    # Get the frame with the eyes and the rest in black
+    only_eyes_frame = cv2.bitwise_and(frame, frame, mask=mask)
 
-# Create the eyes tracker window
-cv2.namedWindow('Tracker')
+    # Get te non-eyes pixels (they are black) and turn them white
+    mask = (only_eyes_frame == [0, 0, 0]).all(axis=2)
+    only_eyes_frame[mask] = [255, 255, 255]
 
-# Kernel is for later dilating the eye zone
-kernel = np.ones((9, 9), np.uint8)
+    # Gets the eyes in grey scale (everything white and the eyes in gray)
+    eyes_gray = cv2.cvtColor(only_eyes_frame, cv2.COLOR_BGR2GRAY)
 
-# Starts the webcam
-video = cv2.VideoCapture(0)
-run = True
-while(run):
-    ret, frame = video.read()
-    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # Get the faces in the frame represented as rectangles
-    faces = faces_detector(gray_frame, 1)
-    for face in faces:
-        # Get the 68 points of the face 
-        face_shape = face_predictor(gray_frame, face)
-        face_array = face_shape_to_array(face_shape)
+    # Applies threshold to the eyes so the pupils are in black and the rest in white
+    _, thresh = cv2.threshold(eyes_gray, THRESHOLD, 255, cv2.THRESH_BINARY)
+    thresh = cv2.erode(thresh, None, iterations=2) #1
+    thresh = cv2.dilate(thresh, None, iterations=4) #2
+    thresh = cv2.medianBlur(thresh, 3) #3
+    
+    # Puts everything in black but the pupils
+    thresh = cv2.bitwise_not(thresh)
 
-        # Rotate image as head tilt
-        frame = rotate_image(frame, face_array)
+    # Getting the pupils and contours them
+    left_pupil = contours_pupil(frame, thresh, face_array, LEFT_EYE_POINTS)
+    right_pupil = contours_pupil(frame, thresh, face_array, RIGHT_EYE_POINTS)
 
-        # Mask is an image sized as frame entirely black except for the eyes (in white)
-        mask = np.zeros(frame.shape[:2], dtype=np.uint8)
-        mask = colour_eye(mask, LEFT_EYE_POINTS, face_array)
-        mask = colour_eye(mask, RIGHT_EYE_POINTS, face_array)
-
-        # Expand the eye zone
-        mask = cv2.dilate(mask, kernel, iterations=5)
-
-        # Get the frame with the eyes and the rest in black
-        only_eyes_frame = cv2.bitwise_and(frame, frame, mask=mask)
-
-        # Get te non-eyes pixels (they are black) and turn them white
-        mask = (only_eyes_frame == [0, 0, 0]).all(axis=2)
-        only_eyes_frame[mask] = [255, 255, 255]
-
-        # Gets the eyes in grey scale (everything white and the eyes in gray)
-        eyes_gray = cv2.cvtColor(only_eyes_frame, cv2.COLOR_BGR2GRAY)
-
-        # Applies threshold to the eyes so the pupils are in black and the rest in white
-        _, thresh = cv2.threshold(eyes_gray, THRESHOLD, 255, cv2.THRESH_BINARY)
-        thresh = cv2.erode(thresh, None, iterations=2) #1
-        thresh = cv2.dilate(thresh, None, iterations=4) #2
-        thresh = cv2.medianBlur(thresh, 3) #3
-        
-        # Puts everything in black but the pupils
-        thresh = cv2.bitwise_not(thresh)
-
-        # Getting the pupils and contours them
-        contours_pupil(frame, thresh, face_array, LEFT_EYE_POINTS)
-        contours_pupil(frame, thresh, face_array, RIGHT_EYE_POINTS)
-
-        # Draw circles on eye points
-        # for (x, y) in face_shape[36:48]:
-        #         cv2.circle(frame, (x, y), 2, (255, 0, 0), -1)
-
-        # Show the final frames
-        cv2.imshow('Tracker', frame)
-        cv2.imshow("Threshold", thresh)
-
-        # Pres key 'q' to exit
-        if cv2.waitKey(1) == ord('q'):
-                run = False
-        
-video.release()
-cv2.destroyAllWindows()
+    return frame, thresh, left_pupil, right_pupil
