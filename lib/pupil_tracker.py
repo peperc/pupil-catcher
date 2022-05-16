@@ -1,4 +1,7 @@
 import cv2
+import dlib
+import os
+
 import numpy as np
 from math import atan
 
@@ -150,3 +153,40 @@ def get_and_draw_pupils(frame, face_array):
     right_pupil = contours_pupil(frame, thresh, face_array, RIGHT_EYE_POINTS)
 
     return frame, thresh, left_pupil, right_pupil
+
+
+def threshold_finder(frame):
+
+    # With the detector, we get faces from frames represented as rectangles 
+    faces_detector = dlib.get_frontal_face_detector()
+    # With the predictor, we get the 68 points representing the face from the face_detector's rectangles
+    face_predictor = dlib.shape_predictor(os.path.join(os.path.dirname(__file__), 'models/shape_68.dat'))
+
+    # Get the faces in the frame represented as rectangles
+    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = faces_detector(gray_frame, 1)
+    # Get the 68 points of the face 
+    face_shape = face_predictor(gray_frame, faces[0])
+    face_array = face_shape_to_array(face_shape)
+
+    # Create the threshold window
+    cv2.namedWindow('Threshold')
+    cv2.createTrackbar('Value', 'Threshold', 0, 255, on_threshold_change)
+
+    # Create the eyes tracker window
+    cv2.namedWindow('Tracker')
+
+    key = -1
+    while(key != 27):
+
+        processed, thresh, left_pupil, right_pupil = get_and_draw_pupils(frame, face_array)
+
+        # Show the final frames
+        cv2.imshow('Tracker', processed)
+        cv2.imshow("Threshold", thresh)
+        
+        # Get next key
+        key = cv2.waitKey(1)
+
+    cv2.destroyAllWindows()
+    return THRESHOLD

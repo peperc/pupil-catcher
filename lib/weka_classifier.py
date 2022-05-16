@@ -1,6 +1,6 @@
-from numpy import append
 from weka.core.dataset import Attribute, Instances, Instance
 from weka.core.converters import Saver
+from weka.filters import Filter
 
 
 def create_dataset():
@@ -26,5 +26,11 @@ def add_to_dataset(dataset, key, left_eye, right_eye):
 
 
 def save_dataset(dataset, path):
+    # First change the first attribute type to nominal
+    filter = Filter (classname="weka.filters.unsupervised.attribite.NumericToNominal", options=["-R","1"])
+    filter.inputformat(dataset)
+    dataset = filter.filter(dataset)
+
+    # Save the dataset
     saver = Saver(classname="weka.core.converters.ArffSaver")
     saver.save_file(dataset, path)
