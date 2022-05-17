@@ -1,4 +1,4 @@
-@relation pressed_keys-weka.filters.unsupervised.attribute.NumericToNominal-R1-weka.filters.unsupervised.attribute.NumericToNominal-R1
+@relation pressed_keys-weka.filters.unsupervised.attribute.NumericToNominal-R1
 
 @attribute pressed_key {}
 @attribute left_x numeric

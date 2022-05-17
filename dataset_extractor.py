@@ -2,6 +2,7 @@ import cv2
 import dlib
 import time
 import os
+import logging
 
 import weka.core.jvm as jvm
 
@@ -22,12 +23,14 @@ cv2.createTrackbar('Value', 'Threshold', 0, 255, on_threshold_change)
 cv2.namedWindow('Tracker')
 
 # Create the dataset for training
-jvm.start()
+jvm.logger.setLevel(logging.ERROR)
+jvm.start(packages=True)
 dataset = create_dataset()
 
 # Starts the webcam
 video = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
+text = ''
 key = -1
 while(key != 27):
     ret, frame = video.read()
@@ -44,6 +47,7 @@ while(key != 27):
 
         if key != -1:
             add_to_dataset(dataset, key, left_pupil, right_pupil)
+            text += chr(key)
             print(f'Instance added to dataset: {key}, {str(left_pupil)}, {str(right_pupil)}')
 
     # Show the final frames
@@ -53,8 +57,11 @@ while(key != 27):
     # Get next key
     key = cv2.waitKey(1)
 
-# Save the dataset
-save_dataset(dataset, os.path.join(os.path.dirname(__file__), f'datasets/{time.strftime("%H-%M-%S", time.localtime())}.arff'))
+# Save the dataset and the plaintext file
+now = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+save_dataset(dataset, os.path.join(os.path.dirname(__file__), f'datasets/{now}.arff'))
+with open(os.path.join(os.path.dirname(__file__), f'datasets/{now}.txt'), 'w') as f:
+    f.write(text)
 
 jvm.stop()
 video.release()

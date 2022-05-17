@@ -2,6 +2,7 @@ import cv2
 import dlib
 import os
 import time
+import logging
 
 import weka.core.jvm as jvm
 
@@ -21,7 +22,8 @@ total_frames= int(video.get(cv2.CAP_PROP_FRAME_COUNT))-1
 ret, frame = video.read()
 
 # Create the dataset for later classification
-jvm.start()
+jvm.logger.setLevel(logging.ERROR)
+jvm.start(packages=True)
 dataset = create_dataset()
 
 # Find a optimal threshold
@@ -47,6 +49,6 @@ while(ret):
         i += 1
 
 # Save the dataset
-save_dataset(dataset, os.path.join(os.path.dirname(__file__), f'datasets/{time.strftime("%H-%M-%S", time.localtime())}.arff'))
+save_dataset(dataset, os.path.join(os.path.dirname(__file__), f'datasets/{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}.arff'))
 
 video.release()
