@@ -24,6 +24,7 @@ pressed_key = 0
 while(pressed_key != 27):
     ret, frame = video.read()
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    
     # Get the faces in the frame represented as rectangles
     faces = faces_detector(gray_frame, 1)
     for face in faces:

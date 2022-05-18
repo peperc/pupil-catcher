@@ -6,14 +6,9 @@ import logging
 
 import weka.core.jvm as jvm
 
-from lib.pupil_tracker import face_shape_to_array, get_and_draw_pupils, on_threshold_change
+from lib.pupil_tracker import face_shape_to_array, get_and_draw_pupils, on_threshold_change, rotate_image, FACE_PREDICTOR, FACES_DETECTOR
 from lib.weka_classifier import create_dataset, add_to_dataset, save_dataset
 
-
-# With the detector, we get faces from frames represented as rectangles 
-faces_detector = dlib.get_frontal_face_detector()
-# With the predictor, we get the 68 points representing the face from the face_detector's rectangles
-face_predictor = dlib.shape_predictor(os.path.join(os.path.dirname(__file__), 'lib/models/shape_68.dat'))
 
 # Create the threshold window
 cv2.namedWindow('Threshold')
@@ -35,12 +30,16 @@ key = -1
 while(key != 27):
     ret, frame = video.read()
 
-    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # Rotate image as head tilt
+    # frame = rotate_image(frame)
+
     # Get the faces in the frame represented as rectangles
-    faces = faces_detector(gray_frame, 1)
+    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = FACES_DETECTOR(gray_frame, 1)
+
     for face in faces:
         # Get the 68 points of the face 
-        face_shape = face_predictor(gray_frame, face)
+        face_shape = FACE_PREDICTOR(gray_frame, face)
         face_array = face_shape_to_array(face_shape)
 
         frame, thresh, left_pupil, right_pupil = get_and_draw_pupils(frame, face_array)
@@ -51,7 +50,7 @@ while(key != 27):
             print(f'Instance added to dataset: {key}, {str(left_pupil)}, {str(right_pupil)}')
 
     # Show the final frames
-    cv2.imshow('Tracker', frame)
+    cv2.imshow('Tracker', frame)    
     cv2.imshow("Threshold", thresh)
     
     # Get next key

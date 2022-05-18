@@ -10,7 +10,6 @@ from lib.pupil_tracker import face_shape_to_array, get_and_draw_pupils, threshol
 from lib.weka_classifier import create_dataset, add_to_dataset, save_dataset
 
 
-
 # With the detector, we get faces from frames represented as rectangles 
 faces_detector = dlib.get_frontal_face_detector()
 # With the predictor, we get the 68 points representing the face from the face_detector's rectangles
@@ -34,9 +33,10 @@ ret = True
 while(ret):
     ret, frame = video.read()
     if ret:
-        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Get the faces in the frame represented as rectangles
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = faces_detector(gray_frame, 1)
+        
         for face in faces:
             # Get the 68 points of the face 
             face_shape = face_predictor(gray_frame, face)
