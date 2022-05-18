@@ -34,6 +34,9 @@ def on_threshold_change(val):
     THRESHOLD = val
 
 
+def head_tilt(face_array: np.ndarray) -> float:
+    return atan((face_array[0][1]-face_array[16][1])/(face_array[45][0]-face_array[36][0]))*180/np.pi*-0.9
+
 def rotate_image(frame: np.ndarray) -> np.ndarray:
     '''
     Take an image and rotate it until the face is not tilted.
@@ -52,8 +55,8 @@ def rotate_image(frame: np.ndarray) -> np.ndarray:
     face_shape = FACE_PREDICTOR(gray_frame, face)
     face_array = face_shape_to_array(face_shape)
     
-    # Get's the angle of the face based on the extremes of the eyes (not so optimal)
-    angle = atan((face_array[36][1]-face_array[45][1])/(face_array[45][0]-face_array[36][0]))*180/np.pi*-0.9
+    # Get the angle of the face
+    angle = head_tilt(face_array)
 
     # Rotate the image
     image_center = tuple(np.array(frame.shape[1::-1]) / 2)
@@ -120,9 +123,6 @@ def contours_pupil(frame: np.ndarray, thres: np.ndarray, face_array: np.ndarray,
 
     # Get two rectangles that surrounds the eyes
     eye_rectangle = get_eye_rectangle(face_array, eye_points)
-    
-    # Draws the rectangle
-    cv2.rectangle(frame, (eye_rectangle[0], eye_rectangle[3]), (eye_rectangle[1], eye_rectangle[2]), (0, 255, 0), 1)
 
     # Finds contours inside the rectangle
     contours, _ = cv2.findContours(thres[eye_rectangle[2]:eye_rectangle[3], eye_rectangle[0]:eye_rectangle[1]], cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
@@ -138,6 +138,9 @@ def contours_pupil(frame: np.ndarray, thres: np.ndarray, face_array: np.ndarray,
 
         # Draw the circle
         cv2.circle(frame, (cx + eye_rectangle[0], cy + eye_rectangle[2]), 4, (0, 0, 255), 2)
+
+        # Draws the rectangle
+        cv2.rectangle(thres, (eye_rectangle[0], eye_rectangle[3]), (eye_rectangle[1], eye_rectangle[2]), (0, 255, 0), 1)
         
         return (cx, cy)
     except:
@@ -152,12 +155,12 @@ def get_and_draw_pupils(frame: np.ndarray, face_array: np.ndarray) -> tuple[np.n
     mask = colour_eye(mask, RIGHT_EYE_POINTS, face_array)
 
     # Expand the eye zone
-    mask = cv2.dilate(mask, KERNEL, iterations=5)
+    mask = cv2.dilate(mask, KERNEL, iterations=1)
 
     # Get the frame with the eyes and the rest in black
     only_eyes_frame = cv2.bitwise_and(frame, frame, mask=mask)
 
-    # Get te non-eyes pixels (they are black) and turn them white
+    # Get the non-eyes pixels (they are black) and turn them white
     mask = (only_eyes_frame == [0, 0, 0]).all(axis=2)
     only_eyes_frame[mask] = [255, 255, 255]
 
@@ -185,6 +188,7 @@ def threshold_finder(frame: np.ndarray) -> int:
     # Get the faces in the frame represented as rectangles
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = FACES_DETECTOR(gray_frame, 1)
+    
     # Get the 68 points of the face 
     face_shape = FACE_PREDICTOR(gray_frame, faces[0])
     face_array = face_shape_to_array(face_shape)
