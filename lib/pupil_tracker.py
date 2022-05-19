@@ -3,7 +3,7 @@ import dlib
 import os
 
 import numpy as np
-from math import atan
+from math import atan, ceil
 
 
 # With the detector, we get faces from frames represented as rectangles 
@@ -22,6 +22,11 @@ THRESHOLD = 0
 # Kernel is for later dilating the eye zone
 KERNEL = np.ones((9, 9), np.uint8)
 
+# Simple function to round numbers
+def round_up(n, decimals=0):
+    multiplier = 10 ** decimals
+    return ceil(n * multiplier) / multiplier
+
 # Callback function for threshold change
 def on_threshold_change(val):
     '''
@@ -35,7 +40,13 @@ def on_threshold_change(val):
 
 
 def head_tilt(face_array: np.ndarray) -> float:
-    return atan((face_array[0][1]-face_array[16][1])/(face_array[45][0]-face_array[36][0]))*180/np.pi*-0.9
+    '''
+    Get the angle of the face, how much tilted it is side to side.
+    :param face_array: The two dimensional array with the 68 face points.
+    '''
+    
+    angle = atan((face_array[0][1]-face_array[16][1])/(face_array[45][0]-face_array[36][0]))*180/np.pi*-0.9
+    return round_up(angle, 2)
 
 def rotate_image(frame: np.ndarray) -> np.ndarray:
     '''
@@ -147,10 +158,26 @@ def contours_pupil(frame: np.ndarray, thres: np.ndarray, face_array: np.ndarray,
         return None
 
 
-def get_and_draw_pupils(frame: np.ndarray, face_array: np.ndarray) -> tuple[np.ndarray, np.ndarray, tuple[int, int], tuple[int, int]]:
+def get_face_parameters(frame: np.ndarray) -> tuple[np.ndarray, np.ndarray, tuple[int, int], tuple[int, int]]:
+
+    # Prepare the threshold mask
+    mask = np.zeros(frame.shape[:2], dtype=np.uint8)
+
+    # Rotate image as head tilt
+    # frame = rotate_image(frame)
+
+    # Get the faces in the frame represented as rectangles
+    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    faces = FACES_DETECTOR(gray_frame, 1)
+
+    if not faces:
+        return frame, mask, None, None, None
+    
+    # Get the 68 points of the face 
+    face_shape = FACE_PREDICTOR(gray_frame, faces[0])
+    face_array = face_shape_to_array(face_shape)
 
     # Mask is an image sized as frame entirely black except for the eyes (in white)
-    mask = np.zeros(frame.shape[:2], dtype=np.uint8)
     mask = colour_eye(mask, LEFT_EYE_POINTS, face_array)
     mask = colour_eye(mask, RIGHT_EYE_POINTS, face_array)
 
@@ -180,18 +207,10 @@ def get_and_draw_pupils(frame: np.ndarray, face_array: np.ndarray) -> tuple[np.n
     left_pupil = contours_pupil(frame, thresh, face_array, LEFT_EYE_POINTS)
     right_pupil = contours_pupil(frame, thresh, face_array, RIGHT_EYE_POINTS)
 
-    return frame, thresh, left_pupil, right_pupil
+    return frame, thresh, face_array, left_pupil, right_pupil
 
 
 def threshold_finder(frame: np.ndarray) -> int:
-
-    # Get the faces in the frame represented as rectangles
-    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = FACES_DETECTOR(gray_frame, 1)
-    
-    # Get the 68 points of the face 
-    face_shape = FACE_PREDICTOR(gray_frame, faces[0])
-    face_array = face_shape_to_array(face_shape)
 
     # Create the threshold window
     cv2.namedWindow('Threshold')
@@ -204,7 +223,7 @@ def threshold_finder(frame: np.ndarray) -> int:
     while(key != 27):
         processed = frame.copy()
 
-        processed, thresh, left_pupil, right_pupil = get_and_draw_pupils(processed, face_array)
+        processed, thresh, face_array, left_pupil, right_pupil = get_face_parameters(processed)
 
         # Show the final frames
         cv2.imshow('Tracker', processed)

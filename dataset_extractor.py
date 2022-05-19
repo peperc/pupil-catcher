@@ -1,12 +1,11 @@
 import cv2
-import time
 import os
+import time
 import logging
 
-import numpy as np
 import weka.core.jvm as jvm
 
-from lib.pupil_tracker import face_shape_to_array, get_and_draw_pupils, on_threshold_change, rotate_image, head_tilt, FACE_PREDICTOR, FACES_DETECTOR
+from lib.pupil_tracker import get_face_parameters, head_tilt, on_threshold_change
 from lib.weka_classifier import create_dataset, add_to_dataset, save_dataset
 
 
@@ -28,27 +27,15 @@ video = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 key = -1
 while(key != 27):
     ret, frame = video.read()
-    thresh = np.zeros(frame.shape[:2], dtype=np.uint8)
+    
+    # Get face parameters
+    frame, thresh, face_array, left_pupil, right_pupil = get_face_parameters(frame)
 
-    # Rotate image as head tilt
-    # frame = rotate_image(frame)
-
-    # Get the faces in the frame represented as rectangles
-    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    faces = FACES_DETECTOR(gray_frame, 1)
-
-    if faces:
-        # Get the 68 points of the face 
-        face_shape = FACE_PREDICTOR(gray_frame, faces[0])
-        face_array = face_shape_to_array(face_shape)
-
-        frame, thresh, left_pupil, right_pupil = get_and_draw_pupils(frame, face_array)
-
-        if key not in [-1, 0]:
-            add_to_dataset(dataset, key, left_pupil, right_pupil, face_array[27], head_tilt(face_array))
-            print(f'Instance added to dataset: {key}, {str(left_pupil)}, {str(right_pupil)}')
+    if key not in [-1, 0] and face_array is not None:
+        angle = head_tilt(face_array)
+        add_to_dataset(dataset, key, left_pupil, right_pupil, face_array[27], angle)
+        print(f'Added: Key {key}, L pupil {str(left_pupil)}, R pupil {str(right_pupil)}, Face position {face_array[27]}, Face angle {angle}')
         
-
     # Show the final frames
     cv2.imshow('Tracker', frame)
     cv2.imshow("Threshold", thresh)
