@@ -171,7 +171,7 @@ def get_face_parameters(frame: np.ndarray) -> tuple[np.ndarray, np.ndarray, tupl
     faces = FACES_DETECTOR(gray_frame, 1)
 
     if not faces:
-        return frame, mask, None, None, None
+        return frame, cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR), None, None, None
     
     # Get the 68 points of the face 
     face_shape = FACE_PREDICTOR(gray_frame, faces[0])
@@ -206,6 +206,13 @@ def get_face_parameters(frame: np.ndarray) -> tuple[np.ndarray, np.ndarray, tupl
     # Getting the pupils and contours them
     left_pupil = contours_pupil(frame, thresh, face_array, LEFT_EYE_POINTS)
     right_pupil = contours_pupil(frame, thresh, face_array, RIGHT_EYE_POINTS)
+
+    # Resize the images
+    frame = cv2.resize(frame, None, fx=0.8, fy=0.8, interpolation=cv2.INTER_LINEAR)
+    thresh = cv2.resize(thresh, None, fx=0.8, fy=0.8, interpolation=cv2.INTER_LINEAR)
+
+    # Convert to 3-channel again so they can be stacked together
+    thresh = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
 
     return frame, thresh, face_array, left_pupil, right_pupil
 
