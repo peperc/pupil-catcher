@@ -8,8 +8,6 @@ dist/
 # IDE
 .vscode/
 
-# My face
+# Secrets
 shots/
-
-# Others
 bitácora.md

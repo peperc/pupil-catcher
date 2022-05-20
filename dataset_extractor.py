@@ -67,7 +67,7 @@ while(key != 27):
 
 # Save the dataset
 now = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
-save_dataset(dataset, os.path.join(os.path.dirname(__file__), f'dataset/{now}.arff'))
+save_dataset(dataset, os.path.join(os.path.dirname(__file__), f'datasets/{now}.arff'))
 
 jvm.stop()
 video.release()
