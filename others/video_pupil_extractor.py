@@ -6,7 +6,7 @@ import logging
 import weka.core.jvm as jvm
 
 from lib.pupil_tracker import get_face_parameters, head_tilt, threshold_finder
-from lib.weka_classifier import create_dataset, add_to_dataset, save_dataset
+from lib.weka_functions import create_dataset, add_to_dataset, save_dataset
 
 
 # Gets the video and it's frames count

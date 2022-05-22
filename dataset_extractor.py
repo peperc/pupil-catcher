@@ -1,14 +1,11 @@
 import cv2
-import os
 import time
-import logging
 import random
 
 import numpy as np
-import weka.core.jvm as jvm
 
 from lib.pupil_tracker import get_face_parameters, head_tilt, on_threshold_change
-from lib.weka_classifier import create_dataset, add_to_dataset, save_dataset
+from lib.portable_weka_functions import create_dataset, add_to_dataset, save_dataset
 from lib.sample_texts import SAMPLE_TEXTS
 
 
@@ -17,12 +14,10 @@ cv2.namedWindow('Tracker')
 cv2.createTrackbar('Threshold', 'Tracker', 0, 255, on_threshold_change)
 
 # Create the dataset for training
-jvm.logger.setLevel(logging.ERROR)
-jvm.start(packages=True)
 dataset = create_dataset()
 
 # Print the text that you should type
-print('\n\n\n' + SAMPLE_TEXTS[random.randint(0,4)] + '\n\n\n')
+print(SAMPLE_TEXTS[random.randint(0,len(SAMPLE_TEXTS)-1)] + '\n\n\n')
 
 # Starts the webcam
 video = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -31,6 +26,9 @@ key = -1
 text = ''
 while(key != 27):
     ret, frame = video.read()
+    if not ret:
+        cv2.destroyAllWindows()
+        raise Exception('Couldn\'t read from your webcam.')
     
     # Get face parameters
     frame, thresh, face_array, left_pupil, right_pupil = get_face_parameters(frame)
@@ -67,8 +65,7 @@ while(key != 27):
 
 # Save the dataset
 now = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
-save_dataset(dataset, os.path.join(os.path.dirname(__file__), f'datasets/{now}.arff'))
+save_dataset(dataset, f'datasets/{now}.arff')
 
-jvm.stop()
 video.release()
 cv2.destroyAllWindows()

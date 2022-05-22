@@ -1,6 +1,6 @@
 numpy
 opencv-python
 dlib
-keyboard
 python-javabridge
 python-weka-wrapper3
+pyinstaller
