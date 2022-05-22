@@ -1,6 +1,5 @@
 import cv2
 import dlib
-import os
 
 import numpy as np
 from math import atan, ceil
@@ -10,7 +9,7 @@ from math import atan, ceil
 FACES_DETECTOR = dlib.get_frontal_face_detector()
 
 # With the predictor, we get the 68 points representing the face from the face_detector's rectangles
-FACE_PREDICTOR = dlib.shape_predictor('lib/models/shape_68.dat')
+FACE_PREDICTOR = dlib.shape_predictor('lib/shape_68.dat')
 
 # This are the points that represent the eyes in the dlib shape_68 model
 LEFT_EYE_POINTS = [36, 37, 38, 39, 40, 41]
