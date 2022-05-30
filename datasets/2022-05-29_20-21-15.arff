@@ -1,0 +1,14 @@
+@relation pressed_keys
+
+@attribute pressed_key numeric
+@attribute left_x numeric
+@attribute left_y numeric
+@attribute right_x numeric
+@attribute right_y numeric
+@attribute centre_x numeric
+@attribute centre_y numeric
+@attribute head_angle numeric
+
+@data
+49,15,3,18,3,393,174,4.26
+54,24,1,4,1,433,176,7.46

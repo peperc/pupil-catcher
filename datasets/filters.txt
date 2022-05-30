@@ -1,0 +1,4 @@
+Remove all values (12, 25, 127) all_together to all_together_filter_1
+
+Value changing from all_together_filter_1 to all_together_filter_2
+    33:49, 34:50, 40:56, 41:57, 47:55, 58:46, 59:44, 62:60, 63:39, 168:180, 191:161, 193:97, 201:101, 205:105, 211:111, 218:117, 225:97, 233:101, 237:105, 243:111, 250:117
