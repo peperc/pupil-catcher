@@ -9,14 +9,14 @@ from weka.core import jvm
 
 HEADER = [
     '@relation pressed_keys\n\n',
-    '@attribute pressed_key numeric\n',
     '@attribute left_x numeric\n',
     '@attribute left_y numeric\n',
     '@attribute right_x numeric\n',
     '@attribute right_y numeric\n',
     '@attribute centre_x numeric\n',
     '@attribute centre_y numeric\n',
-    '@attribute head_angle numeric\n\n',
+    '@attribute head_angle numeric\n',
+    '@attribute pressed_key numeric\n\n',
     '@data\n'
 ]
 
@@ -55,32 +55,32 @@ def preprocess(keystroke: str) -> str:
     if parameters[0] in [str(12), str(25), str(127)]: return None
 
     # Changes to match the key
-    if parameters[0] == str(33): return str(49) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(34): return str(50) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(40): return str(56) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(41): return str(57) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(47): return str(55) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(58): return str(46) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(59): return str(44) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(62): return str(60) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(63): return str(39) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(168): return str(180) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(191): return str(161) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(193): return str(97) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(201): return str(101) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(205): return str(105) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(211): return str(111) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(218): return str(117) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(225): return str(97) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(233): return str(101) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(237): return str(105) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(243): return str(111) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(250): return str(117) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(199): return str(231) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(242): return str(111) + keystroke[len(parameters[0]):]
-    elif parameters[0] == str(95): return str(45) + keystroke[len(parameters[0]):]
+    if parameters[0] == str(33): return keystroke[len(parameters[0])+1:-1] + ',' + str(49) + '\n'
+    elif parameters[0] == str(34): return keystroke[len(parameters[0])+1:-1] + ',' + str(50) + '\n'
+    elif parameters[0] == str(40): return keystroke[len(parameters[0])+1:-1] + ',' + str(56) + '\n'
+    elif parameters[0] == str(41): return keystroke[len(parameters[0])+1:-1] + ',' + str(57) + '\n'
+    elif parameters[0] == str(47): return keystroke[len(parameters[0])+1:-1] + ',' + str(55) + '\n'
+    elif parameters[0] == str(58): return keystroke[len(parameters[0])+1:-1] + ',' + str(46) + '\n'
+    elif parameters[0] == str(59): return keystroke[len(parameters[0])+1:-1] + ',' + str(44) + '\n'
+    elif parameters[0] == str(62): return keystroke[len(parameters[0])+1:-1] + ',' + str(60) + '\n'
+    elif parameters[0] == str(63): return keystroke[len(parameters[0])+1:-1] + ',' + str(39) + '\n'
+    elif parameters[0] == str(168): return keystroke[len(parameters[0])+1:-1] + ',' + str(180) + '\n'
+    elif parameters[0] == str(191): return keystroke[len(parameters[0])+1:-1] + ',' + str(161) + '\n'
+    elif parameters[0] == str(193): return keystroke[len(parameters[0])+1:-1] + ',' + str(97) + '\n'
+    elif parameters[0] == str(201): return keystroke[len(parameters[0])+1:-1] + ',' + str(101) + '\n'
+    elif parameters[0] == str(205): return keystroke[len(parameters[0])+1:-1] + ',' + str(105) + '\n'
+    elif parameters[0] == str(211): return keystroke[len(parameters[0])+1:-1] + ',' + str(111) + '\n'
+    elif parameters[0] == str(218): return keystroke[len(parameters[0])+1:-1] + ',' + str(117) + '\n'
+    elif parameters[0] == str(225): return keystroke[len(parameters[0])+1:-1] + ',' + str(97) + '\n'
+    elif parameters[0] == str(233): return keystroke[len(parameters[0])+1:-1] + ',' + str(101) + '\n'
+    elif parameters[0] == str(237): return keystroke[len(parameters[0])+1:-1] + ',' + str(105) + '\n'
+    elif parameters[0] == str(243): return keystroke[len(parameters[0])+1:-1] + ',' + str(111) + '\n'
+    elif parameters[0] == str(250): return keystroke[len(parameters[0])+1:-1] + ',' + str(117) + '\n'
+    elif parameters[0] == str(199): return keystroke[len(parameters[0])+1:-1] + ',' + str(231) + '\n'
+    elif parameters[0] == str(242): return keystroke[len(parameters[0])+1:-1] + ',' + str(111) + '\n'
+    elif parameters[0] == str(95): return keystroke[len(parameters[0])+1:-1] + ',' + str(45) + '\n'
 
-    else: return keystroke
+    else: return keystroke[len(parameters[0])+1:-1] + ',' + parameters[0] + '\n'
     
 
 def join_and_preprocess_tests(file_names: list[str], output_path: str):
@@ -105,7 +105,7 @@ def join_and_preprocess_tests(file_names: list[str], output_path: str):
     dataset = loader.load_file(output_path)
 
     # Make pressed_key nominal
-    filter = Filter(classname="weka.filters.unsupervised.attribute.NumericToNominal", options=["-R","1"])
+    filter = Filter(classname="weka.filters.unsupervised.attribute.NumericToNominal", options=["-R","last"])
     filter.inputformat(dataset)
     dataset = filter.filter(dataset)
 
@@ -120,10 +120,10 @@ def join_and_preprocess_tests(file_names: list[str], output_path: str):
 
 if __name__ == '__main__':
     excel_path = './datasets/arff_index.xlsx'
-    output_path = './1_forced.arff'
+    output_path = './11_light_3.arff'
     tests = get_test_from_excel(excel_path)
 
     # Filter!
-    tests = filter_tests(tests, forced='yes')
+    tests = filter_tests(tests, lighting=3)
 
     join_and_preprocess_tests(tests['File name'], output_path)
