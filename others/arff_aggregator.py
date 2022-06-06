@@ -7,7 +7,6 @@ from weka.filters import Filter
 from weka.core import jvm
 
 
-
 HEADER = [
     '@relation pressed_keys\n\n',
     '@attribute pressed_key numeric\n',
@@ -23,6 +22,31 @@ HEADER = [
 
 def get_test_from_excel(path: str) -> pd.DataFrame:
     return pd.read_excel(path, header=0, engine='openpyxl')
+
+
+def filter_tests(tests: pd.DataFrame, gender: str = None, old: str = None, glasses: str = None, forced: str = None, lighting: int = None) -> pd.DataFrame:
+    # man or woman
+    if gender:
+        tests = tests[tests['Gender'] == gender]
+    
+    # yes or no
+    if old:
+        tests = tests[tests['Old'] == old]
+    
+    # yes or no
+    if glasses:
+        tests = tests[tests['Glasses'] == glasses]
+
+    # yes or no
+    if forced:
+        tests = tests[tests['Forced'] == forced]
+
+    # 1, 2 or 3
+    if lighting:
+        tests = tests[tests['Lighting'] == lighting]
+    
+    return tests
+
 
 
 def preprocess(keystroke: str) -> str:
@@ -96,7 +120,10 @@ def join_and_preprocess_tests(file_names: list[str], output_path: str):
 
 if __name__ == '__main__':
     excel_path = './datasets/arff_index.xlsx'
-    dataset_path = './all_together.arff'
+    output_path = './1_forced.arff'
     tests = get_test_from_excel(excel_path)
-    join_and_preprocess_tests(tests['File name'], dataset_path)
 
+    # Filter!
+    tests = filter_tests(tests, forced='yes')
+
+    join_and_preprocess_tests(tests['File name'], output_path)
