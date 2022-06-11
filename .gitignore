@@ -9,8 +9,7 @@ dist/
 .vscode/
 
 # Secrets
-shots/
+secrets/
 bitácora.md
 datasets/arff_index.xlsx
-datasets/second/arff_index_2.xlsx
 datasets/aggregated/experiments/research_compare.xlsx

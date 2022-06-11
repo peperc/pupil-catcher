@@ -1,5 +1,4 @@
 import logging
-import time
 
 import weka.core.jvm as jvm
 
@@ -23,9 +22,9 @@ jvm.start(packages=True)
 classifier, _ = load_classifier('models/svm_all.model')
 
 # Load the evaluation dataset
-dataset = load_dataset('4.mp4.arff')
+dataset = load_dataset('datasets/2022-06-11_17-28-50.arff')
 
-# Predict text
+# Predict text (this is not working, not getting same results as weka does)
 file = open("predicted.txt", "w")
 for inst in dataset:
     file.write(get_prediction(classifier, dataset, inst) + '\n')
