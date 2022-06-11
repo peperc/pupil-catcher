@@ -45,7 +45,7 @@ def save_dataset(dataset, path):
 def load_dataset(path: str) -> Instances:
     # Load the training data
     loader = Loader(classname="weka.core.converters.ArffLoader")
-    return loader.load_file(path, class_index='first')
+    return loader.load_file(path, class_index='last')
 
 
 def train_classifier(dataset: Instances) -> Classifier:

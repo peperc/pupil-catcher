@@ -219,8 +219,8 @@ def get_face_parameters(frame: np.ndarray) -> tuple[np.ndarray, np.ndarray, tupl
 def threshold_finder(frame: np.ndarray) -> int:
 
     # Create the threshold window
-    cv2.namedWindow('Threshold')
-    cv2.createTrackbar('Value', 'Threshold', 0, 255, on_threshold_change)
+    cv2.namedWindow('Tracker')
+    cv2.createTrackbar('Threshold', 'Tracker', 0, 255, on_threshold_change)
 
     # Create the eyes tracker window
     cv2.namedWindow('Tracker')
@@ -232,8 +232,8 @@ def threshold_finder(frame: np.ndarray) -> int:
         processed, thresh, face_array, left_pupil, right_pupil = get_face_parameters(processed)
 
         # Show the final frames
-        cv2.imshow('Tracker', processed)
-        cv2.imshow("Threshold", thresh)
+        both = np.vstack((thresh, processed))
+        cv2.imshow("Tracker", both)
         
         # Get next key
         key = cv2.waitKey(1)

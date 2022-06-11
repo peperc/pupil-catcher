@@ -1,6 +1,4 @@
 import cv2
-import os
-import time
 import logging
 
 import weka.core.jvm as jvm
@@ -9,8 +7,10 @@ from lib.pupil_tracker import get_face_parameters, head_tilt, threshold_finder
 from lib.weka_functions import create_dataset, add_to_dataset, save_dataset
 
 
+VIDEO_PATH = 'shots/4.mp4'
+
 # Gets the video and it's frames count
-video = cv2.VideoCapture('shots/3.mp4')
+video = cv2.VideoCapture(VIDEO_PATH)
 total_frames= int(video.get(cv2.CAP_PROP_FRAME_COUNT))-1
 ret, frame = video.read()
 
@@ -40,4 +40,5 @@ while(ret):
         i += 1
 
 # Save the dataset
-save_dataset(dataset, os.path.join(os.path.dirname(__file__), f'datasets/{time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())}.arff'))
+video_name = VIDEO_PATH.split('/')[-1]
+save_dataset(dataset, f'{video_name}.arff')

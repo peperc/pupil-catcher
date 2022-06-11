@@ -1,4 +1,4 @@
-@relation pressed_keys-weka.filters.unsupervised.attribute.NumericToNominal-Rlast
+@relation 11_light_3-weka.filters.unsupervised.attribute.NumericToNominal-Rlast
 
 @attribute left_x numeric
 @attribute left_y numeric
