@@ -52,7 +52,7 @@ def filter_tests(tests: pd.DataFrame, gender: str = None, old: str = None, glass
 def preprocess(keystroke: str) -> str:
     # Noise first
     parameters = keystroke.split(',')
-    if parameters[0] in [str(12), str(25), str(127)]: return None
+    if parameters[0] in [str(12), str(25), str(127), str(32)]: return None
 
     # Changes to match the key
     if parameters[0] == str(33): return keystroke[len(parameters[0])+1:-1] + ',' + str(49) + '\n'
@@ -120,7 +120,7 @@ def join_and_preprocess_tests(file_names: list[str], output_path: str):
 
 if __name__ == '__main__':
     excel_path = './datasets/arff_index.xlsx'
-    output_path = './11_light_3.arff'
+    output_path = './datasets/aggregated/11_light_3_no_spaces.arff'
     tests = get_test_from_excel(excel_path)
 
     # Filter!
