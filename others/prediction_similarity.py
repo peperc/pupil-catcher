@@ -6,11 +6,10 @@ from keyboard_map import KEYBOARD_MAP
 
 EXPERIMENTS = [
     'D:/jrc/uc3m/tfm-repo/datasets/experiments/search-IBK',
-    #'D:/jrc/uc3m/tfm-repo/datasets/experiments/search-J48',
-    #'D:/jrc/uc3m/tfm-repo/datasets/experiments/search-LMT',
-    #'D:/jrc/uc3m/tfm-repo/datasets/experiments/search-logistic',
-    #'D:/jrc/uc3m/tfm-repo/datasets/experiments/search-SMO',
-    #'D:/jrc/uc3m/tfm-repo/datasets/experiments/search-SVM'
+    'D:/jrc/uc3m/tfm-repo/datasets/experiments/search-J48',
+    'D:/jrc/uc3m/tfm-repo/datasets/experiments/search-LMT',
+    'D:/jrc/uc3m/tfm-repo/datasets/experiments/search-logistic',
+    'D:/jrc/uc3m/tfm-repo/datasets/experiments/search-SVM'
 ]
 
 COLUMNS = ['dataset', 'predict_means', 'predict_std', 'accuracy_means', 'accuracy_std']
@@ -49,8 +48,6 @@ def get_percentage_correct_and_accuracy(predictions: pd.DataFrame, dataset: str)
     
     return pd.DataFrame([[dataset, np.mean(folds_prediction_results), np.std(folds_prediction_results), np.mean(folds_accuracy_results), np.std(folds_accuracy_results)]], columns=COLUMNS)
 
-        
-        
 
 
 if __name__ == '__main__':
