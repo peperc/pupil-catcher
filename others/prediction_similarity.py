@@ -65,5 +65,3 @@ if __name__ == '__main__':
             final_results = pd.concat([final_results, results], ignore_index=True)
         
         final_results.to_excel(experiment + '/results.xlsx', index=False)
-
-        

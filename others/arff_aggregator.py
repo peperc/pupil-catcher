@@ -24,7 +24,16 @@ def get_test_from_excel(path: str) -> pd.DataFrame:
     return pd.read_excel(path, header=0, engine='openpyxl')
 
 
-def filter_tests(tests: pd.DataFrame, gender: str = None, old: str = None, glasses: str = None, forced: str = None, lighting: int = None) -> pd.DataFrame:
+def filter_tests(tests: pd.DataFrame, no_ids: list[int] = None, id: int = None, gender: str = None, old: str = None, glasses: str = None, forced: str = None, lighting: int = None) -> pd.DataFrame:
+    # id
+    if no_ids:
+        for user in no_ids:
+            tests = tests[tests['ID'] != user]
+
+    # id
+    if id:
+        tests = tests[tests['ID'] == id]
+
     # man or woman
     if gender:
         tests = tests[tests['Gender'] == gender]
@@ -88,7 +97,7 @@ def join_and_preprocess_tests(file_names: list[str], output_path: str):
     o.writelines(HEADER)
 
     for file_name in file_names:
-        with open('./datasets/' + file_name + '.arff', 'r') as test:
+        with open('./datasets/raw/' + file_name + '.arff', 'r') as test:
             keystrokes = test.readlines()
             for keystroke in keystrokes[12:]:
                 keystroke = preprocess(keystroke)
@@ -119,11 +128,11 @@ def join_and_preprocess_tests(file_names: list[str], output_path: str):
 
 
 if __name__ == '__main__':
-    excel_path = './datasets/arff_index.xlsx'
-    output_path = './datasets/aggregated/11_light_3_no_spaces.arff'
+    excel_path = './datasets/raw/arff_index.xlsx'
+    output_path = './datasets/aggregated/forced_tests/9_light_3_no_forced.arff'
     tests = get_test_from_excel(excel_path)
 
     # Filter!
-    tests = filter_tests(tests, lighting=3)
+    tests = filter_tests(tests, forced='no', lighting=3)
 
     join_and_preprocess_tests(tests['File name'], output_path)
