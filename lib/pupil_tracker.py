@@ -147,10 +147,10 @@ def contours_pupil(frame: np.ndarray, thres: np.ndarray, face_array: np.ndarray,
         cy = int(centre['m01']/centre['m00'])
 
         # Draw the circle
-        cv2.circle(frame, (cx + eye_rectangle[0], cy + eye_rectangle[2]), 4, (0, 0, 255), 2)
+        cv2.circle(frame, (cx + eye_rectangle[0], cy + eye_rectangle[2]), 1, (0, 0, 255), 2)
 
         # Draws the rectangle
-        cv2.rectangle(thres, (eye_rectangle[0], eye_rectangle[3]), (eye_rectangle[1], eye_rectangle[2]), (0, 255, 0), 1)
+        cv2.rectangle(frame, (eye_rectangle[0], eye_rectangle[3]), (eye_rectangle[1], eye_rectangle[2]), (255, 0, 0), 1)
         
         return (cx, cy)
     except:
@@ -198,6 +198,7 @@ def get_face_parameters(frame: np.ndarray) -> tuple[np.ndarray, np.ndarray, tupl
     thresh = cv2.erode(thresh, None, iterations=2) #1
     thresh = cv2.dilate(thresh, None, iterations=4) #2
     thresh = cv2.medianBlur(thresh, 3) #3
+
     
     # Puts everything in black but the pupils
     thresh = cv2.bitwise_not(thresh)
