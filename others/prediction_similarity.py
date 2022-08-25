@@ -30,7 +30,7 @@ def round_up(n, decimals=2):
     multiplier = 10 ** decimals
     return ceil(n * multiplier) / multiplier
 
-def get_percentage_correct_and_accuracy(predictions: pd.DataFrame, dataset: int) -> pd.DataFrame:
+def get_percentage_correct_and_accuracy(predictions: pd.DataFrame, dataset: str) -> pd.Series:
     predictions = predictions.reset_index()  # make sure indexes pair with number of rows
 
     folds_prediction_results = []
@@ -156,6 +156,7 @@ def pre_n(experiments: list[str], tests: int):
             
         final_results.to_excel(experiment + '/predictions_n.xlsx', index=False)
 
+        
 if __name__ == '__main__':
     pre_n(EXPERIMENTS_FORCED, 10)
     

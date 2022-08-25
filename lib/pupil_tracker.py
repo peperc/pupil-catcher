@@ -202,6 +202,7 @@ def get_face_parameters(frame: np.ndarray) -> tuple[np.ndarray, np.ndarray, tupl
     thresh = cv2.erode(thresh, None, iterations=2) #1
     thresh = cv2.dilate(thresh, None, iterations=4) #2
     thresh = cv2.medianBlur(thresh, 3) #3
+
     
     # Puts everything in black but the pupils
     thresh = cv2.bitwise_not(thresh)
