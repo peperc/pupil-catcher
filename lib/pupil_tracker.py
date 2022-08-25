@@ -171,7 +171,11 @@ def get_face_parameters(frame: np.ndarray) -> tuple[np.ndarray, np.ndarray, tupl
 
     if not faces:
         return frame, cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR), None, None, None
-    
+
+    # Draw the found faces
+    #for face in faces:
+    #    cv2.rectangle(frame, (face.left(), face.top()), (face.right(), face.bottom()), (0, 255, 0), 2)
+        
     # Get the 68 points of the face 
     face_shape = FACE_PREDICTOR(gray_frame, faces[0])
     face_array = face_shape_to_array(face_shape)
@@ -198,7 +202,6 @@ def get_face_parameters(frame: np.ndarray) -> tuple[np.ndarray, np.ndarray, tupl
     thresh = cv2.erode(thresh, None, iterations=2) #1
     thresh = cv2.dilate(thresh, None, iterations=4) #2
     thresh = cv2.medianBlur(thresh, 3) #3
-
     
     # Puts everything in black but the pupils
     thresh = cv2.bitwise_not(thresh)

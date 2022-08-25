@@ -3,4 +3,3 @@ opencv-python
 dlib
 python-javabridge
 python-weka-wrapper3
-pyinstaller

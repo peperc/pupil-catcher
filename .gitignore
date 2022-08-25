@@ -11,5 +11,6 @@ dist/
 # Secrets
 secrets/
 bitácora.md
-datasets/arff_index.xlsx
 datasets/aggregated/experiments/research_compare.xlsx
+datasets/raw/arff_index.xlsx
+datasets/experiments/
